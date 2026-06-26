@@ -1,0 +1,21 @@
+model and tokenizer built
+model and tokenizer built
+model and tokenizer built
+model and tokenizer built
+dataset and dataloader built
+dataset and dataloader built
+dataset and dataloader built
+dataset and dataloader built
+Warning: The cache directory for DeepSpeed Triton autotune, /home/yw784/.triton/autotune, appears to be on an NFS system. While this is generally acceptable, if you experience slowdowns or hanging when DeepSpeed exits, it is recommended to set the TRITON_CACHE_DIR environment variable to a non-NFS path.
+Warning: The cache directory for DeepSpeed Triton autotune, /home/yw784/.triton/autotune, appears to be on an NFS system. While this is generally acceptable, if you experience slowdowns or hanging when DeepSpeed exits, it is recommended to set the TRITON_CACHE_DIR environment variable to a non-NFS path.
+Warning: The cache directory for DeepSpeed Triton autotune, /home/yw784/.triton/autotune, appears to be on an NFS system. While this is generally acceptable, if you experience slowdowns or hanging when DeepSpeed exits, it is recommended to set the TRITON_CACHE_DIR environment variable to a non-NFS path.
+Warning: The cache directory for DeepSpeed Triton autotune, /home/yw784/.triton/autotune, appears to be on an NFS system. While this is generally acceptable, if you experience slowdowns or hanging when DeepSpeed exits, it is recommended to set the TRITON_CACHE_DIR environment variable to a non-NFS path.
+Installed CUDA version 12.4 does not match the version torch was compiled with 12.8 but since the APIs are compatible, accepting this combination
+Installed CUDA version 12.4 does not match the version torch was compiled with 12.8 but since the APIs are compatible, accepting this combination
+Installed CUDA version 12.4 does not match the version torch was compiled with 12.8 but since the APIs are compatible, accepting this combinationInstalled CUDA version 12.4 does not match the version torch was compiled with 12.8 but since the APIs are compatible, accepting this combination
+
+trainer built, start training
+trainer built, start training
+trainer built, start training
+trainer built, start training
+Warning: The cache directory for DeepSpeed Triton autotune, /home/yw784/.triton/autotune, appears to be on an NFS system. While this is generally acceptable, if you experience slowdowns or hanging when DeepSpeed exits, it is recommended to set the TRITON_CACHE_DIR environment variable to a non-NFS path.
