@@ -1,0 +1,10 @@
+Loaded 1319 problems from gsm8k
+
+gsm8k Accuracy: 0.9007 (1188/1319)
+Summary saved to ../outputs/eval/gsm8k/Qwen3-4B-sft-openr1math-5k-subset/eval_results.json
+Raw outputs saved to ../outputs/eval/gsm8k/Qwen3-4B-sft-openr1math-5k-subset/raw_outputs.jsonl
+Loaded 1319 problems from gsm8k
+
+gsm8k Accuracy: 0.8173 (1078/1319)
+Summary saved to ../outputs/eval/gsm8k/Qwen3-4B/eval_results.json
+Raw outputs saved to ../outputs/eval/gsm8k/Qwen3-4B/raw_outputs.jsonl
