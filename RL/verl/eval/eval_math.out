@@ -1,0 +1,5 @@
+Loaded 1319 problems from gsm8k
+
+gsm8k Accuracy: 0.9348 (1233/1319)
+Summary saved to ../outputs/eval/gsm8k/Qwen3-4B-rl-gsmk/eval_results.json
+Raw outputs saved to ../outputs/eval/gsm8k/Qwen3-4B-rl-gsmk/raw_outputs.jsonl
