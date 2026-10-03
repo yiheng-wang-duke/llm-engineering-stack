@@ -1,0 +1,80 @@
+services:
+  app:
+    build: .
+    ports: ["127.0.0.1:8080:8080"]
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      AW_MODE: ${AW_MODE:-vllm}
+      AW_EMBEDDING_BACKEND: ${AW_EMBEDDING_BACKEND:-bm25}
+      AW_DATA_DIR: /data
+      AW_LLM_BASE_URL: http://vllm-chat:8000/v1
+      AW_EMBEDDING_BASE_URL: http://vllm-embedding:8000/v1
+    volumes: [agent-data:/data]
+    restart: unless-stopped
+
+  vllm-chat:
+    image: ${VLLM_IMAGE:-vllm/vllm-openai:v0.11.0}
+    profiles: [gpu]
+    command:
+      - --model
+      - ${AW_LLM_MODEL:-Qwen/Qwen3-4B-Instruct-2507}
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --api-key
+      - ${AW_LLM_API_KEY:-local-dev-key}
+      - --max-model-len
+      - ${VLLM_MAX_MODEL_LEN:-16384}
+      - --gpu-memory-utilization
+      - ${VLLM_CHAT_MEMORY:-0.65}
+      - --max-num-seqs
+      - "8"
+      - --enable-auto-tool-choice
+      - --tool-call-parser
+      - hermes
+    volumes: [model-cache:/root/.cache/huggingface]
+    shm_size: 2gb
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["${VLLM_CHAT_GPU:-0}"]
+              capabilities: [gpu]
+
+  vllm-embedding:
+    image: ${VLLM_IMAGE:-vllm/vllm-openai:v0.11.0}
+    profiles: [embedding]
+    command:
+      - --model
+      - ${AW_EMBEDDING_MODEL:-Qwen/Qwen3-Embedding-0.6B}
+      - --runner
+      - pooling
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --api-key
+      - ${AW_EMBEDDING_API_KEY:-local-dev-key}
+      - --max-model-len
+      - "4096"
+      - --gpu-memory-utilization
+      - ${VLLM_EMBED_MEMORY:-0.20}
+      - --max-num-seqs
+      - "16"
+    volumes: [model-cache:/root/.cache/huggingface]
+    shm_size: 1gb
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["${VLLM_EMBED_GPU:-0}"]
+              capabilities: [gpu]
+
+volumes:
+  agent-data:
+  model-cache:

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f7f8f4"><title>Agent Studio · 本地智能工作台</title>
+  <link rel="stylesheet" href="/static/style.css"><script src="/static/app.js" defer></script>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="/"><span class="brand-icon">a<span>·</span></span><div>Agent Studio<small>LOCAL INTELLIGENCE</small></div></a>
+    <button id="new-chat" class="primary new-chat"><span>＋</span> 新建对话 <kbd>N</kbd></button>
+    <div class="nav-label">工作空间</div>
+    <nav aria-label="主导航">
+      <button data-view="chat" class="nav-item active"><span class="nav-icon">◈</span> 对话工作台</button>
+      <button data-view="knowledge" class="nav-item"><span class="nav-icon">▤</span> 知识库 <span class="count" id="doc-count">0</span></button>
+      <button data-view="memory" class="nav-item"><span class="nav-icon">◎</span> 长期记忆 <span class="count" id="memory-count">0</span></button>
+      <button data-view="settings" class="nav-item"><span class="nav-icon">⚙</span> 运行配置</button>
+    </nav>
+    <div class="nav-label history-label">最近对话 <span id="session-count"></span></div>
+    <div id="sessions" class="sessions"></div>
+    <div class="sidebar-bottom"><span class="local-dot"></span><div>你的本地工作空间<small>数据保存在应用服务器</small></div><span class="version">v0.1</span></div>
+  </aside>
+  <main>
+    <header class="topbar">
+      <div class="breadcrumb"><button id="menu-button" class="icon-button" aria-label="切换导航">☰</button><span>工作空间</span><b>/</b><strong id="view-title">对话工作台</strong></div>
+      <div class="top-actions"><span id="mode-badge" class="badge">加载配置</span><button id="health-button" class="status"><span class="status-dot"></span><span id="health-label">检查连接</span></button></div>
+    </header>
+    <div id="banner" class="banner" hidden></div>
+    <section id="view-chat" class="view chat-view">
+      <div class="conversation">
+        <div class="conversation-head"><div><span class="eyebrow">CONVERSATION</span><h2 id="chat-title">新对话</h2></div><div class="head-actions"><button id="export-chat" class="text-button">导出</button><button id="toggle-trace" class="text-button">链路面板 ◫</button></div></div>
+        <div id="messages" class="messages" aria-live="polite">
+          <div id="welcome" class="welcome">
+            <div class="welcome-mark">✳</div><span class="eyebrow">THINK · RETRIEVE · ACT</span>
+            <h1>让想法，连接行动。</h1><p>带着你的知识和记忆，与本地 Agent 一起工作。<br>每一次检索、每一步工具调用，都清晰可见。</p>
+            <div class="suggestions">
+              <button data-prompt="请介绍知识库中的项目架构，并引用相关资料。"><span>▤</span><strong>从知识中找答案</strong><small>检索文档，追溯回答来源 ↗</small></button>
+              <button data-prompt="/remember 我偏好用中文交流，代码示例使用 Python。"><span>◎</span><strong>让助手记住偏好</strong><small>跨会话保留重要信息 ↗</small></button>
+              <button data-prompt="请用计算器计算 (128 * 24 + 960) / 12"><span>⌘</span><strong>交给工具来完成</strong><small>计算、检索与多步执行 ↗</small></button>
+            </div>
+            <div class="welcome-note"><span class="local-dot"></span> Qwen × vLLM <span>·</span> 可切换模型 <span>·</span> 持久化记忆</div>
+          </div>
+        </div>
+        <div class="composer-wrap">
+          <form id="chat-form" class="composer">
+            <label for="prompt" class="sr-only">发送消息</label>
+            <textarea id="prompt" rows="2" maxlength="4000" placeholder="提一个问题，或输入 /remember 保存记忆…" required></textarea>
+            <div class="composer-bottom"><div class="toggles"><label><input type="checkbox" id="use-rag" checked> ▤ 知识库</label><label><input type="checkbox" id="use-memory" checked> ◎ 记忆</label></div><div class="send-group"><small>Enter 发送 · Shift + Enter 换行</small><button type="button" id="stop-button" class="stop-button" hidden>停止</button><button id="send-button" type="submit" class="send-button" aria-label="发送消息">↑</button></div></div>
+          </form>
+          <div class="composer-note">回答可能有误，请核对来源。<span id="model-label"></span></div>
+        </div>
+      </div>
+      <aside id="trace-panel" class="trace-panel">
+        <div class="panel-heading"><span>运行链路</span><span class="badge subtle" id="run-status">就绪</span><button id="close-trace" class="icon-button" aria-label="关闭链路面板">×</button></div>
+        <p class="panel-description">查看上下文、检索来源和实际工具执行。</p>
+        <div class="pipeline"><span>记忆</span><i>→</i><span>检索</span><i>→</i><span>Agent</span><i>→</i><span>回答</span></div>
+        <div class="panel-section-label">执行事件 <span id="event-count">0</span></div>
+        <div id="trace" class="trace"><div class="empty-small">发送消息后，执行事件将在这里显示。</div></div>
+        <div class="panel-section-label">参考来源 <span id="source-count">0</span></div>
+        <div id="sources" class="sources"><div class="empty-small">检索到的原文片段会显示在这里。</div></div>
+        <div id="run-metrics" class="run-metrics"></div>
+      </aside>
+    </section>
+    <section id="view-knowledge" class="view page-view" hidden>
+      <div class="page-heading"><div><span class="eyebrow">KNOWLEDGE BASE</span><h1>把资料变成知识。</h1><p>上传文档，分块索引，让每个回答有据可查。</p></div><button class="secondary" id="reindex">重建索引</button></div>
+      <label class="upload-zone" id="drop-zone"><input type="file" id="file-input" accept=".md,.txt,.pdf,.csv,.json" multiple><span class="upload-icon">↥</span><strong>拖入文件，或点击上传</strong><span id="upload-hint">支持 PDF、Markdown、TXT、CSV、JSON</span></label>
+      <div class="section-toolbar"><h2>文档 <span id="doc-total" class="muted">0</span></h2><button id="load-example" class="text-button">导入示例文档 ↗</button></div>
+      <div id="document-list" class="card-list"></div>
+      <div class="search-card"><h2>检索测试</h2><p>直接检查索引返回的片段和排序，不调用聊天模型。</p><form id="search-form" class="inline-form"><label class="sr-only" for="search-query">检索关键词</label><input id="search-query" placeholder="输入问题或关键词…" maxlength="500" required><button class="primary">检索</button></form><div id="search-results" class="search-results"></div></div>
+    </section>
+    <section id="view-memory" class="view page-view" hidden>
+      <div class="page-heading"><div><span class="eyebrow">PERSISTENT MEMORY</span><h1>重要的事，不必重复。</h1><p>主动保存偏好和事实，在新的对话中继续使用。</p></div><span class="badge">跨会话记忆</span></div>
+      <form id="memory-form" class="memory-editor"><label for="memory-content">添加一条记忆</label><textarea id="memory-content" maxlength="1000" rows="3" placeholder="例如：我正在构建 Python Agent 项目，喜欢简洁的中文解释。" required></textarea><div><small>也可以在对话中输入 /remember 内容</small><button class="primary">保存记忆</button></div></form>
+      <div class="section-toolbar"><h2>已保存的记忆 <span id="memory-total" class="muted">0</span></h2><span class="muted">可随时删除</span></div>
+      <div id="memory-list" class="card-list"></div>
+    </section>
+    <section id="view-settings" class="view page-view" hidden>
+      <div class="page-heading"><div><span class="eyebrow">RUNTIME</span><h1>每一层，都在掌握中。</h1><p>推理、检索和存储的当前运行配置。</p></div><a href="/docs" target="_blank" rel="noreferrer" class="secondary">API 文档 ↗</a></div>
+      <div class="settings-grid" id="runtime-config"></div>
+      <form id="token-form" class="search-card"><h2>访问令牌</h2><p>服务器配置了 AW_API_TOKEN 时填写。令牌仅保存在当前浏览器标签页。</p><div class="inline-form"><label class="sr-only" for="api-token">API 访问令牌</label><input type="password" id="api-token" autocomplete="off" placeholder="未配置令牌时留空"><button class="primary">保存并连接</button></div></form>
+      <div class="info-card"><strong>部署配置</strong><p>通过项目根目录的 .env 设置模型、vLLM 地址与 Embedding 后端，修改后重启应用。默认只监听本机，完整部署步骤见项目 README。</p><code>python -m workbench --port 8080</code></div>
+    </section>
+  </main>
+</div>
+<dialog id="detail-dialog"><div class="dialog-head"><h2 id="detail-title"></h2><button id="close-dialog" class="icon-button" aria-label="关闭">×</button></div><div id="detail-body"></div></dialog>
+<div id="toast" class="toast" role="status" hidden></div>
+</body></html>
